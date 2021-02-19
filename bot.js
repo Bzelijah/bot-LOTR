@@ -1,23 +1,25 @@
 require('dotenv').config();
 const {
   Telegraf,
-  Markup,
 } = require('telegraf');
 const fetch = require('node-fetch');
-const inlineKeyboard = require('./keyboard');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 bot.start((ctx) => ctx.reply(`Привет, ${ctx.message.from.first_name}!
 Подробнее всего тебе  о Средиземье тебе расскажут книжки, введи /books, чтобы узнать их название.
 Если же ты хочешь познакомиться с каким то конкретно персонажем, то введи /search. Если же ты просто хочешь отвлечься,
-то напиши /chuck.`, inlineKeyboard));
+то напиши /chuck.`));
+
+bot.on('text', (ctx) => {
+  ctx.reply('Можешь узнать у меня что нибудь!')
+})
 
 bot.command('/search', (searchCtx) => {
   searchCtx.reply('Введи имя персонажа');
   bot.on('text', async (ctx) => {
-    const reg = /^[a-z]+$/i;
-    if (!ctx.message.text.match(reg)) {
+    const reg = /[а-яё]$/iu;
+    if (ctx.message.text.match(reg)) {
       ctx.reply('Имена персонажей в моей записной книжке написаны на английском!');
       return;
     }
@@ -78,7 +80,3 @@ bot.command('/chuck', async (ctx) => {
 });
 
 bot.launch();
-
-module.exports = {
-  Markup,
-};
